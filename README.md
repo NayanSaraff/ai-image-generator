@@ -10,7 +10,6 @@ A production-ready, portfolio-grade Streamlit web application that transforms te
 |---|---|
 | **Groq-Powered** | Uses Groq's blazing-fast LPU inference for near-instant generation |
 | **Style-Conditioned Prompts** | 6 styles: Realistic, Anime, Cyberpunk, Fantasy, Watercolor, 3D Render |
-| **Image Size Selector** | 512×512 · 1024×1024 · 1024×1792 |
 | **Multi-Image Generation** | Generate 1, 2, or 4 images per request in a responsive grid |
 | **Negative Prompt** | Exclude unwanted elements from your image |
 | **Random Prompt Generator** | One-click inspiration from 30+ curated creative prompts |
@@ -181,8 +180,3 @@ For a portfolio demo, session state is zero-dependency and perfectly sufficient.
 - **Negative prompt as suffix:** Groq's image API does not expose a separate `negative_prompt` field, so exclusions are appended to the positive prompt as `"Avoid: ..."`.
 - **Rate limits:** Free-tier Groq accounts have per-minute request limits. The app surfaces these as friendly error messages.
 
----
-
-## 📄 License
-
-MIT — free to use, modify, and distribute.
