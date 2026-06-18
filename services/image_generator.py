@@ -76,11 +76,17 @@ def _refine_prompt_with_groq(prompt: str, negative_prompt: Optional[str] = None)
 
 _POLLINATIONS_BASE = "https://image.pollinations.ai/prompt"
 
-_SIZE_MAP = {
-    "512x512":   (512,  512),
-    "1024x1024": (1024, 1024),
-    "1024x1792": (1024, 1792),
-}
+def _parse_size(size: str) -> tuple[int, int]:
+    """
+    Parse a 'WxH' size string into (width, height) integers.
+    Falls back to 1024x1024 if the format is unexpected.
+    Pollinations accepts any resolution — no fixed map needed.
+    """
+    try:
+        w, h = size.lower().split("x")
+        return int(w), int(h)
+    except Exception:
+        return 1024, 1024
 
 
 def _fetch_pollinations_image(
@@ -132,6 +138,7 @@ def generate_images(
     size: str,
     num_images: int,
     negative_prompt: Optional[str] = None,
+    seed: Optional[int] = None,
 ) -> List[Image.Image]:
     """
     Generate images using Groq (prompt refinement) + Pollinations.ai (rendering).
@@ -145,6 +152,7 @@ def generate_images(
         size:            Image dimensions string e.g. '1024x1024'.
         num_images:      Number of images to generate (1, 2, or 4).
         negative_prompt: Optional elements to exclude.
+        seed:            Integer seed for reproducibility. None = random each run.
 
     Returns:
         List of PIL Image objects.
@@ -155,11 +163,12 @@ def generate_images(
     # Step 1 — Groq prompt enrichment (optional)
     refined_prompt = _refine_prompt_with_groq(prompt, negative_prompt)
 
-    # Step 2 — Resolve dimensions
-    width, height = _SIZE_MAP.get(size, (1024, 1024))
+    # Step 2 — Resolve dimensions from 'WxH' string
+    width, height = _parse_size(size)
 
-    # Step 3 — Generate all images (unique seed per image for variety)
-    base_seed = int(time.time())
+    # Step 3 — Resolve seed (use provided seed or generate random one)
+    import time as _time
+    base_seed: int = seed if seed is not None else int(_time.time()) % 999999
     images: List[Image.Image] = []
 
     for i in range(num_images):
@@ -170,8 +179,6 @@ def generate_images(
             seed=base_seed + i,
             negative_prompt=negative_prompt,
         )
-        print("Requested:", width, "x", height)
-        print("Received:", img.size)
         images.append(img)
 
     return images
