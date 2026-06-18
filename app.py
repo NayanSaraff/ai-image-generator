@@ -188,6 +188,8 @@ def _css(theme: str) -> None:
 
     /* hide default streamlit header chrome */
     #MainMenu, footer {{ visibility:hidden; }}
+
+    
     </style>
     """, unsafe_allow_html=True)
 
@@ -393,32 +395,20 @@ with tab_generate:
             value=DEFAULT_NUM_IMAGES,
         )
 
-        # Model info card
-        st.markdown("""
-        <div class="ctrl-card" style="margin-top:1rem;">
-            <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:0.6;margin-bottom:0.5rem;">Pipeline</div>
-            <div style="font-size:0.82rem;line-height:1.8;">
-                🔵 <b>Prompt</b> → Style templates<br>
-                ✨ <b>Refine</b> → Groq llama-3.3-70b<br>
-                🖼️ <b>Render</b> → Pollinations FLUX
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("")
+        _, btn_col, _ = st.columns([1, 4, 1])
+        with btn_col:
+            generate_btn = st.button(
+                "✨ Generate Images",
+                type="primary",
+                use_container_width=True,
+            )
+        if st.session_state["last_prompt"]:
+            st.caption(f"Last: *{st.session_state['last_prompt'][:50]}…*")
+
+    
 
     st.divider()
-
-    # ── Generate button ───────────────────────────────────────────────────────
-    gen_col, info_col = st.columns([2, 3])
-    with gen_col:
-        generate_btn = st.button(
-            "✨ Generate Images",
-            type="primary",
-            use_container_width=True,
-        )
-    with info_col:
-        if st.session_state["last_prompt"]:
-            st.caption(f"Last: *{st.session_state['last_prompt'][:60]}…*")
-
     # ── Generation logic ──────────────────────────────────────────────────────
     if generate_btn:
         if not user_prompt.strip():
